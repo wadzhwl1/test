@@ -49,7 +49,8 @@ features = np.array([feature_values])
 
 if st.button("Predict"):
     # 加载模型
-    model = joblib.load('#lgb_op.pkl')
+    # model = joblib.load('#lgb_op.pkl')
+    model = joblib.load('/mnt/c/Users/cc/PycharmProjects/test/#lgb_op.pkl')
 
     # 进行预测
     predicted_class = model.predict(features)[0]
@@ -57,7 +58,7 @@ if st.button("Predict"):
 
     # 显示预测结果
     st.write(f"**Predicted Class:** {predicted_class}")
-    st.write(f"**Prediction Probabilities:** {predicted_proba}")
+    # st.write(f"**Prediction Probabilities:** {predicted_proba}")
     probability = predicted_proba[predicted_class] * 100
 
     if predicted_class == 1:
@@ -69,13 +70,14 @@ if st.button("Predict"):
 
     # 使用 SHAP 解释预测
     explainer = shap.TreeExplainer(model)
-    shap_values = explainer(pd.DataFrame([feature_values], columns=feature_names))
 
     # 显示 SHAP 力导向图
-    shap.plots.force(shap_values[0, ...], matplotlib=True, show=True, )
-    # plt.close()
+    # plt.figure(figsize=(15, 5), dpi=1200)
+    # shap_values = explainer.shap_values(pd.DataFrame([feature_values], columns=feature_names))
     # shap.force_plot(explainer.expected_value, shap_values[0], pd.DataFrame([feature_values], columns=feature_names), matplotlib=True)
-    # plt.savefig("shap_force_plot.png", bbox_inches='tight', dpi=300)
-    plt.show
-    # plt.close()
-    # st.image("shap_force_plot.png")
+
+    # 瀑布图
+    shap_values = explainer(pd.DataFrame([feature_values], columns=feature_names))
+    shap.plots.waterfall(shap_values[-1], max_display=12, show=True)
+    plt.savefig("shap_force_plot.png", bbox_inches='tight', format='png')
+    st.image("shap_force_plot.png")
