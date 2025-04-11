@@ -49,8 +49,8 @@ features = np.array([feature_values])
 
 if st.button("Predict"):
     # 加载模型
-    # model = joblib.load('#lgb_op.pkl')
-    model = joblib.load('/mnt/c/Users/cc/PycharmProjects/test/#lgb_op.pkl')
+    model = joblib.load('#lgb_op.pkl')
+    # model = joblib.load('/mnt/c/Users/cc/PycharmProjects/test/#lgb_op.pkl')
 
     # 进行预测
     predicted_class = model.predict(features)[0]
