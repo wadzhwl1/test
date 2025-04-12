@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# 定义特征名称
 feature_names = [
     "Gender", "Tumor Size", "Wavelet-LHH_glrlm_LowGrayLevelRunEmphasis",
     "Wavelet-LLH_glcm_Correlation", "Wavelet-LHH_gldm_DependenceNonUniformityNormalized",
@@ -15,21 +14,17 @@ feature_names = [
     "Original_glrlm_LongRunLowGrayLevelEmphasis"
 ]
 
-# 特征默认值
 default_values = [
-    # 数据1
     # 0, 1.8, 0.0586096111126547, 0.152320654124126, 0.071395153856487, 3.585217627709164,
     # 61.57615661621094, 0.0094457048759033, 3.190494227725063, 3.918425987296181, 4233.0, 0.0516863372919313,
 
-    # 数据2
-    0.0, 4.2,
-    82225.0, 0.0993999161932017,
+    0.0, 4.2, 82225.0, 0.0993999161932017,
     2.625075542712968, 53.39099884033203,
     0.0363411079070871, 0.0390479429623455, 0.0677708098186266,
     0.0043550137961862, 2.953906961344337, 2.499698143184412,
 ]
 
-# 创建两列布局
+st.title("              ccRCC ISUP Grade Group Predictor               ")
 col1, col2 = st.columns(2)
 
 with col1:
@@ -47,7 +42,6 @@ with col2:
     wavelet_HLH_glrlm_RunEntropy = st.number_input("Wavelet-HLH_glrlm_RunEntropy:", value=default_values[8])
     wavelet_HLH_glszm_ZoneEntropy = st.number_input("Wavelet-HLH_glszm_ZoneEntropy:", value=default_values[9])
 
-# 处理输入并进行预测
 feature_values = [
     gender, tumor_size,
     diagnostics_Mask_interpolated_VoxelNum,
@@ -67,9 +61,8 @@ features = np.array([feature_values])
 # feature_values = default_values
 # features = np.array([feature_values])
 
-st.title("              ccRCC ISUP Grade Group Predictor               ")
+
 if st.button("Predict"):
-    # 加载模型
     model = joblib.load('#lgb_op.pkl')
     # model = joblib.load('/mnt/c/Users/cc/PycharmProjects/test/#lgb_op.pkl')
 
@@ -77,7 +70,6 @@ if st.button("Predict"):
     predicted_proba = model.predict_proba(features)[0]
     print(predicted_proba)
 
-    # 显示预测结果
     st.write(f"**Predicted Class:** {predicted_class}")
     # st.write(f"**Prediction Probabilities:** {predicted_proba}")
     probability = predicted_proba[predicted_class] * 100
@@ -88,15 +80,11 @@ if st.button("Predict"):
         advice = f"**The model predicts probability is {probability:.1f}%. The prediction is for -  >>  isupGG 1-2**"
     st.write(advice)
 
-    # 使用 SHAP 解释预测
     explainer = shap.TreeExplainer(model)
-
-    # 显示 SHAP 力导向图
     # plt.figure(figsize=(15, 5), dpi=1200)
     # shap_values = explainer.shap_values(pd.DataFrame([feature_values], columns=feature_names))
     # shap.force_plot(explainer.expected_value, shap_values[0], pd.DataFrame([feature_values], columns=feature_names), matplotlib=True)
 
-    # 瀑布图
     shap_values = explainer(pd.DataFrame([feature_values], columns=feature_names))
     shap.plots.waterfall(shap_values[-1], max_display=12, show=True)
     plt.savefig("shap.png", bbox_inches='tight', format='png')
